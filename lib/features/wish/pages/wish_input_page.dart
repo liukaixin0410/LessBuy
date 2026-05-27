@@ -108,7 +108,7 @@ class _WishInputPageState extends ConsumerState<WishInputPage> {
                   prefixIcon: Icon(Icons.category),
                   border: OutlineInputBorder(),
                 ),
-                initialValue: _selectedCategory,
+                value: _selectedCategory,
                 items: AppConstants.categories.map((category) {
                   return DropdownMenuItem(value: category, child: Text(category));
                 }).toList(),
@@ -121,7 +121,7 @@ class _WishInputPageState extends ConsumerState<WishInputPage> {
                   prefixIcon: Icon(Icons.help_outline),
                   border: OutlineInputBorder(),
                 ),
-                initialValue: _selectedReason,
+                value: _selectedReason,
                 items: AppConstants.reasons.map((reason) {
                   return DropdownMenuItem(value: reason, child: Text(reason));
                 }).toList(),

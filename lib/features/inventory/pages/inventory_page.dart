@@ -221,7 +221,7 @@ class _AddItemDialogState extends ConsumerState<_AddItemDialog> {
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
               decoration: const InputDecoration(labelText: '分类'),
-              initialValue: _selectedCategory,
+              value: _selectedCategory,
               items: AppConstants.categories.map((category) {
                 return DropdownMenuItem(value: category, child: Text(category));
               }).toList(),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../app/theme.dart';
 import '../providers/data_providers.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../wish/pages/wish_input_page.dart';
@@ -88,7 +89,7 @@ class _HomeTab extends ConsumerWidget {
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, stack) => Center(child: Text('加载失败: $error')),
       data: (stats) => SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -125,48 +126,49 @@ class _HomeTab extends ConsumerWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpacing.xl),
             const Text(
               '快捷操作',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
-            Card(
-              child: ListTile(
-                leading: const Icon(Icons.add_photo_alternate, color: Colors.green),
-                title: const Text('导入订单截图'),
-                subtitle: const Text('识别订单并添加到记录'),
-                trailing: const Icon(Icons.arrow_forward_ios),
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const UploadPage()),
-                ),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 8),
-            Card(
-              child: ListTile(
-                leading: const Icon(Icons.add_shopping_cart, color: Colors.blue),
-                title: const Text('记录想买的东西'),
-                subtitle: const Text('获得 AI 购买建议'),
-                trailing: const Icon(Icons.arrow_forward_ios),
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const WishInputPage()),
-                ),
+            const SizedBox(height: AppSpacing.md),
+            _QuickActionCard(
+              icon: Icons.add_photo_alternate_outlined,
+              title: '导入订单截图',
+              subtitle: '识别订单并添加到记录',
+              color: AppColors.primary,
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const UploadPage()),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpacing.sm),
+            _QuickActionCard(
+              icon: Icons.add_shopping_cart_outlined,
+              title: '记录想买的东西',
+              subtitle: '获得 AI 购买建议',
+              color: AppColors.info,
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const WishInputPage()),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.xl),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
                   '最近想买',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 TextButton(
                   onPressed: () {
-                    // 跳转到冷静期/想买页面
                     context.findAncestorStateOfType<_HomePageState>()?.setState(() {
                       context.findAncestorStateOfType<_HomePageState>()?._currentIndex = 2;
                     });
@@ -175,60 +177,93 @@ class _HomeTab extends ConsumerWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             wishItemsAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (error, stack) => Text('加载失败: $error'),
               data: (wishItems) => wishItems.isEmpty
-                  ? Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(32),
-                        child: Column(
-                          children: [
-                            Icon(Icons.shopping_bag_outlined, size: 48, color: Colors.grey[400]),
-                            const SizedBox(height: 12),
-                            Text('还没有想买的东西~', style: TextStyle(color: Colors.grey[600])),
-                          ],
-                        ),
+                  ? Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(AppSpacing.xl),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(AppRadius.xl),
+                        boxShadow: AppShadows.card,
+                      ),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.shopping_bag_outlined,
+                            size: 56,
+                            color: Colors.grey[300],
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          Text(
+                            '还没有想买的东西~',
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
                       ),
                     )
                   : ListView.separated(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: wishItems.take(5).length,
-                      separatorBuilder: (context, index) => const SizedBox(height: 8),
+                      separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.sm),
                       itemBuilder: (context, index) {
                         final item = wishItems[index];
-                        return Card(
-                          elevation: 2,
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(AppRadius.xl),
+                            boxShadow: AppShadows.card,
+                          ),
                           child: ListTile(
-                            leading: CircleAvatar(
-                              backgroundColor: _getCategoryColor(item.category).withOpacity(0.1),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.md,
+                              vertical: AppSpacing.sm,
+                            ),
+                            leading: Container(
+                              padding: const EdgeInsets.all(AppSpacing.md),
+                              decoration: BoxDecoration(
+                                color: _getCategoryColor(item.category).withOpacity(0.1),
+                                shape: BoxShape.circle,
+                              ),
                               child: Icon(
                                 _getCategoryIcon(item.category),
                                 color: _getCategoryColor(item.category),
+                                size: 24,
                               ),
                             ),
                             title: Text(
                               item.itemName,
-                              style: const TextStyle(fontWeight: FontWeight.w500),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
+                              ),
                             ),
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const SizedBox(height: 4),
+                                const SizedBox(height: AppSpacing.xs),
                                 Text(
                                   '${item.category ?? '未分类'} · ${item.reason ?? ''}',
-                                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                  ),
                                 ),
                                 if (item.estimatedPrice != null)
                                   Padding(
-                                    padding: const EdgeInsets.only(top: 2),
+                                    padding: const EdgeInsets.only(top: AppSpacing.xs),
                                     child: Text(
                                       '预算: ¥${item.estimatedPrice!.toStringAsFixed(0)}',
                                       style: TextStyle(
                                         fontSize: 12,
-                                        color: Colors.grey[600],
+                                        color: Colors.grey[700],
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
@@ -237,7 +272,6 @@ class _HomeTab extends ConsumerWidget {
                             ),
                             trailing: _StatusChip(item.status),
                             onTap: () {
-                              // 可以跳转到详情页
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text('查看: ${item.itemName}')),
                               );
@@ -269,22 +303,40 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        boxShadow: AppShadows.card,
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 32, color: color),
-            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.sm),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, size: 28, color: color),
+            ),
+            const SizedBox(height: AppSpacing.md),
             Text(
               value,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppSpacing.xs),
             Text(
               title,
-              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey[600],
+              ),
               textAlign: TextAlign.center,
             ),
           ],
@@ -359,5 +411,77 @@ Color _getCategoryColor(String? category) {
       return Colors.brown;
     default:
       return Colors.grey;
+  }
+}
+
+class _QuickActionCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _QuickActionCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppRadius.xl),
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(AppRadius.xl),
+          boxShadow: AppShadows.card,
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(AppRadius.lg),
+              ),
+              child: Icon(icon, color: color, size: 28),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              color: Colors.grey[400],
+              size: 16,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

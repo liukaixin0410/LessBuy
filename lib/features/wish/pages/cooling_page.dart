@@ -1,42 +1,102 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../app/theme.dart';
 import '../../../models/wish_item.dart';
 import '../../home/providers/data_providers.dart';
 
 class CoolingPage extends ConsumerWidget {
   const CoolingPage({super.key});
 
+  IconData _getCategoryIcon(String? category) {
+    switch (category) {
+      case '食品':
+        return Icons.restaurant;
+      case '日用品':
+        return Icons.home;
+      case '服装':
+        return Icons.checkroom;
+      case '电子产品':
+        return Icons.phone_android;
+      case '家居':
+        return Icons.chair;
+      default:
+        return Icons.shopping_bag;
+    }
+  }
+
+  Color _getCategoryColor(String? category) {
+    switch (category) {
+      case '食品':
+        return Colors.green;
+      case '日用品':
+        return Colors.blue;
+      case '服装':
+        return Colors.purple;
+      case '电子产品':
+        return Colors.orange;
+      case '家居':
+        return Colors.brown;
+      default:
+        return Colors.grey;
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final wishItemsAsync = ref.watch(wishItemsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('冷静期')),
+      appBar: AppBar(
+        title: const Text(
+          '冷静期',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        elevation: 0,
+      ),
       body: wishItemsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => Center(child: Text('加载失败: $error')),
         data: (wishItems) {
-          final coolingItems = wishItems.where((item) => item.status == 'cooling').toList();
+          final coolingItems =
+              wishItems.where((item) => item.status == 'cooling').toList();
 
           if (coolingItems.isEmpty) {
-            return const Center(
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.hourglass_empty, size: 80, color: Colors.grey),
-                  SizedBox(height: 16),
-                  Text('暂无冷静期中的商品', style: TextStyle(fontSize: 16)),
+                  Icon(
+                    Icons.hourglass_empty_outlined,
+                    size: 80,
+                    color: Colors.grey[400],
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  Text(
+                    '暂无冷静期中的商品',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  const Text(
+                    '添加想买的商品，开始冷静期吧！',
+                    style: TextStyle(fontSize: 14),
+                  ),
                 ],
               ),
             );
           }
 
           return ListView.separated(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppSpacing.lg),
             itemCount: coolingItems.length,
-            separatorBuilder: (context, index) => const SizedBox(height: 12),
+            separatorBuilder: (context, index) =>
+                const SizedBox(height: AppSpacing.md),
             itemBuilder: (context, index) => _CoolingItemCard(
               item: coolingItems[index],
+              categoryIcon: _getCategoryIcon(coolingItems[index].category),
+              categoryColor: _getCategoryColor(coolingItems[index].category),
             ),
           );
         },
@@ -47,66 +107,122 @@ class CoolingPage extends ConsumerWidget {
 
 class _CoolingItemCard extends ConsumerWidget {
   final WishItem item;
+  final IconData categoryIcon;
+  final Color categoryColor;
 
-  const _CoolingItemCard({required this.item});
+  const _CoolingItemCard({
+    required this.item,
+    required this.categoryIcon,
+    required this.categoryColor,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Card(
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        boxShadow: AppShadows.card,
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  decoration: BoxDecoration(
+                    color: categoryColor.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    categoryIcon,
+                    color: categoryColor,
+                    size: 28,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         item.itemName,
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 8),
-                      if (item.category != null)
-                        Chip(
-                          label: Text(item.category!),
-                          backgroundColor: Colors.blue.withOpacity(0.1),
-                          labelStyle: const TextStyle(color: Colors.blue, fontSize: 12),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
-                      if (item.itemPrice != null)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 4),
-                          child: Text(
-                            '¥${item.itemPrice!.toStringAsFixed(2)}',
-                            style: const TextStyle(fontSize: 16),
+                      ),
+                      if (item.category != null) ...[
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          item.category!,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
                           ),
                         ),
+                      ],
+                      if (item.itemPrice != null) ...[
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          '¥${item.itemPrice!.toStringAsFixed(0)}',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.secondary,
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
                 _CountdownChip(endTime: item.coolingEndTime),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.lg),
             Row(
               children: [
                 Expanded(
                   child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.error,
+                      side:
+                          BorderSide(color: AppColors.error.withOpacity(0.5)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md,
+                        vertical: AppSpacing.md,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppRadius.lg),
+                      ),
+                    ),
                     onPressed: () => _handleSkip(context, ref),
-                    icon: const Icon(Icons.block, color: Colors.red),
-                    label: const Text('放弃', style: TextStyle(color: Colors.red)),
+                    icon: const Icon(Icons.block),
+                    label: const Text('放弃'),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md,
+                        vertical: AppSpacing.md,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppRadius.lg),
+                      ),
+                    ),
                     onPressed: () => _handleBuy(context, ref),
                     icon: const Icon(Icons.check, color: Colors.white),
-                    label: const Text('购买', style: TextStyle(color: Colors.white)),
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                    label: const Text(
+                      '购买',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ),
               ],
@@ -122,11 +238,23 @@ class _CoolingItemCard extends ConsumerWidget {
       final updated = item.copyWith(status: 'skipped');
       await ref.read(updateWishItemProvider(updated).future);
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('已放弃！')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('已放弃！'),
+            backgroundColor: AppColors.success,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('操作失败: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('操作失败: $e'),
+            backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
       }
     }
   }
@@ -136,11 +264,23 @@ class _CoolingItemCard extends ConsumerWidget {
       final updated = item.copyWith(status: 'purchased');
       await ref.read(updateWishItemProvider(updated).future);
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('已记录！')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('已记录！'),
+            backgroundColor: AppColors.success,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('操作失败: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('操作失败: $e'),
+            backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
       }
     }
   }
@@ -180,10 +320,35 @@ class _CountdownChipState extends State<_CountdownChip> {
     final hours = _remaining.inHours;
     final minutes = _remaining.inMinutes.remainder(60);
 
-    return Chip(
-      label: Text('${hours}h ${minutes}m'),
-      backgroundColor: Colors.blue.withOpacity(0.1),
-      labelStyle: const TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.info.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(AppRadius.full),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            Icons.hourglass_empty,
+            size: 16,
+            color: AppColors.info,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            '${hours}h ${minutes}m',
+            style: const TextStyle(
+              color: AppColors.info,
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
+

@@ -157,27 +157,92 @@ class _HomeTab extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
-              '最近想买',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  '最近想买',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                TextButton(
+                  onPressed: () {
+                    // 跳转到冷静期/想买页面
+                    context.findAncestorStateOfType<_HomePageState>()?.setState(() {
+                      context.findAncestorStateOfType<_HomePageState>()?._currentIndex = 2;
+                    });
+                  },
+                  child: const Text('查看全部'),
+                ),
+              ],
             ),
             const SizedBox(height: 12),
             wishItemsAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (error, stack) => Text('加载失败: $error'),
               data: (wishItems) => wishItems.isEmpty
-                  ? const Center(child: Text('暂无记录'))
+                  ? Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(32),
+                        child: Column(
+                          children: [
+                            Icon(Icons.shopping_bag_outlined, size: 48, color: Colors.grey[400]),
+                            const SizedBox(height: 12),
+                            Text('还没有想买的东西~', style: TextStyle(color: Colors.grey[600])),
+                          ],
+                        ),
+                      ),
+                    )
                   : ListView.separated(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      itemCount: wishItems.take(3).length,
-                      separatorBuilder: (context, index) => const Divider(height: 1),
+                      itemCount: wishItems.take(5).length,
+                      separatorBuilder: (context, index) => const SizedBox(height: 8),
                       itemBuilder: (context, index) {
                         final item = wishItems[index];
-                        return ListTile(
-                          title: Text(item.itemName),
-                          subtitle: Text('${item.category ?? '未分类'} · ${item.reason ?? ''}'),
-                          trailing: _StatusChip(item.status),
+                        return Card(
+                          elevation: 2,
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: _getCategoryColor(item.category).withOpacity(0.1),
+                              child: Icon(
+                                _getCategoryIcon(item.category),
+                                color: _getCategoryColor(item.category),
+                              ),
+                            ),
+                            title: Text(
+                              item.itemName,
+                              style: const TextStyle(fontWeight: FontWeight.w500),
+                            ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 4),
+                                Text(
+                                  '${item.category ?? '未分类'} · ${item.reason ?? ''}',
+                                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                                ),
+                                if (item.estimatedPrice != null)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 2),
+                                    child: Text(
+                                      '预算: ¥${item.estimatedPrice!.toStringAsFixed(0)}',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey[600],
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            trailing: _StatusChip(item.status),
+                            onTap: () {
+                              // 可以跳转到详情页
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('查看: ${item.itemName}')),
+                              );
+                            },
+                          ),
                         );
                       },
                     ),
@@ -260,5 +325,39 @@ class _StatusChip extends StatelessWidget {
       backgroundColor: color.withOpacity(0.1),
       labelStyle: TextStyle(color: color),
     );
+  }
+}
+
+IconData _getCategoryIcon(String? category) {
+  switch (category) {
+    case '食品':
+      return Icons.restaurant;
+    case '日用品':
+      return Icons.home;
+    case '服装':
+      return Icons.checkroom;
+    case '电子产品':
+      return Icons.phone_android;
+    case '家居':
+      return Icons.chair;
+    default:
+      return Icons.shopping_bag;
+  }
+}
+
+Color _getCategoryColor(String? category) {
+  switch (category) {
+    case '食品':
+      return Colors.green;
+    case '日用品':
+      return Colors.blue;
+    case '服装':
+      return Colors.purple;
+    case '电子产品':
+      return Colors.orange;
+    case '家居':
+      return Colors.brown;
+    default:
+      return Colors.grey;
   }
 }

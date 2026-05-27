@@ -256,11 +256,11 @@ class _HomeTab extends ConsumerWidget {
                                     color: Colors.grey[600],
                                   ),
                                 ),
-                                if (item.estimatedPrice != null)
+                                if (item.itemPrice != null)
                                   Padding(
                                     padding: const EdgeInsets.only(top: AppSpacing.xs),
                                     child: Text(
-                                      '预算: ¥${item.estimatedPrice!.toStringAsFixed(0)}',
+                                      '预算: ¥${item.itemPrice!.toStringAsFixed(0)}',
                                       style: TextStyle(
                                         fontSize: 12,
                                         color: Colors.grey[700],

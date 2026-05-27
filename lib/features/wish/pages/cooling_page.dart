@@ -73,7 +73,7 @@ class _CoolingItemCard extends ConsumerWidget {
                       if (item.category != null)
                         Chip(
                           label: Text(item.category!),
-                          backgroundColor: Colors.blue.withValues(alpha: 0.1),
+                          backgroundColor: Colors.blue.withOpacity(0.1),
                           labelStyle: const TextStyle(color: Colors.blue, fontSize: 12),
                         ),
                       if (item.itemPrice != null)
@@ -182,7 +182,7 @@ class _CountdownChipState extends State<_CountdownChip> {
 
     return Chip(
       label: Text('${hours}h ${minutes}m'),
-      backgroundColor: Colors.blue.withValues(alpha: 0.1),
+      backgroundColor: Colors.blue.withOpacity(0.1),
       labelStyle: const TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
     );
   }

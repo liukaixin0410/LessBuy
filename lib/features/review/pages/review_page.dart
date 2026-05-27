@@ -22,7 +22,7 @@ class ReviewPage extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Card(
-                color: Colors.blue.withValues(alpha: 0.1),
+                color: Colors.blue.withOpacity(0.1),
                 child: Padding(
                   padding: const EdgeInsets.all(20),
                   child: Column(
@@ -98,7 +98,7 @@ class _MiniStat extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
+        color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -206,7 +206,7 @@ class _HistoryItem extends StatelessWidget {
       subtitle: item.category != null ? Text(item.category!) : null,
       trailing: Chip(
         label: Text(label),
-        backgroundColor: color.withValues(alpha: 0.1),
+        backgroundColor: color.withOpacity(0.1),
         labelStyle: TextStyle(color: color),
       ),
     );

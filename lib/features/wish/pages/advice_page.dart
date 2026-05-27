@@ -33,7 +33,7 @@ class AdvicePage extends ConsumerWidget {
                     if (wishItem.category != null)
                       Chip(
                         label: Text(wishItem.category!),
-                        backgroundColor: Colors.blue.withValues(alpha: 0.1),
+                        backgroundColor: Colors.blue.withOpacity(0.1),
                         labelStyle: const TextStyle(color: Colors.blue),
                       ),
                     if (wishItem.itemPrice != null) ...[
@@ -189,7 +189,7 @@ class _AdviceCard extends StatelessWidget {
     }
 
     return Card(
-      color: cardColor.withValues(alpha: 0.1),
+      color: cardColor.withOpacity(0.1),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(

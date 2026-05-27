@@ -238,7 +238,7 @@ class _OcrItemCardState extends State<_OcrItemCard> {
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     decoration: const InputDecoration(labelText: '分类'),
-                    initialValue: _category,
+                    value: _category,
                     items: AppConstants.categories.map((category) {
                       return DropdownMenuItem(value: category, child: Text(category));
                     }).toList(),

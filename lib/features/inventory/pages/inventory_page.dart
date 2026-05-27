@@ -80,7 +80,7 @@ class _InventoryItemCard extends ConsumerWidget {
                 ),
                 Chip(
                   label: Text('x${item.quantity.toInt()}'),
-                  backgroundColor: Colors.green.withValues(alpha: 0.1),
+                  backgroundColor: Colors.green.withOpacity(0.1),
                   labelStyle: const TextStyle(color: Colors.green),
                 ),
               ],
@@ -91,15 +91,15 @@ class _InventoryItemCard extends ConsumerWidget {
                 if (item.category != null)
                   Chip(
                     label: Text(item.category!),
-                    backgroundColor: Colors.blue.withValues(alpha: 0.1),
+                    backgroundColor: Colors.blue.withOpacity(0.1),
                     labelStyle: const TextStyle(color: Colors.blue, fontSize: 12),
                   ),
                 const SizedBox(width: 8),
                 Chip(
                   label: Text(item.status == 'enough' ? '充足' : '不足'),
                   backgroundColor: item.status == 'enough'
-                      ? Colors.green.withValues(alpha: 0.1)
-                      : Colors.orange.withValues(alpha: 0.1),
+                      ? Colors.green.withOpacity(0.1)
+                      : Colors.orange.withOpacity(0.1),
                   labelStyle: TextStyle(
                     color: item.status == 'enough' ? Colors.green : Colors.orange,
                     fontSize: 12,
